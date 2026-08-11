@@ -1,8 +1,5 @@
-/* 
- * Copyright (c) 2018, 2026, Oracle and/or its affiliates. 
- * Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl/
- */
-/* Copyright (c) 2024, 2026, Oracle and/or its affiliates. */
+// Copyright (c) 2018, 2026, Oracle and/or its affiliates. 
+// Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl/ 
 package oracle.jdbc.driver.json.oracle;
 
 import java.io.ByteArrayOutputStream;
@@ -13,7 +10,6 @@ import java.util.Base64;
 
 import oracle.jdbc.driver.VectorData;
 import oracle.jdbc.driver.json.JsonTestCase;
-import oracle.sql.VECTOR;
 import oracle.sql.json.OracleJsonFactory;
 import oracle.sql.json.OracleJsonGenerator;
 import oracle.sql.json.OracleJsonObject;
@@ -155,18 +151,23 @@ public class OracleJsonVectorTest extends JsonTestCase {
     byte[] floatData = VectorData.encode(floats);
     byte[] byteData = VectorData.encode(bytes);
 
-    assertEquals("2wAAEgMAAAADAAAAAAAAAAC/8AAAAAAAAD//////////wAgAAAAAAAA=",
+    assertEquals("2wAAEgMAAAADwA3u6hFoP0m/8AAAAAAAAD//////////wAgAAAAAAAA=",
       Base64.getEncoder().encodeToString(doubleData));
-    assertEquals("2wAAEgIAAAADAAAAAAAAAAC/gAAAP////8BAAAA=",
+    assertEquals("2wAAEgIAAAADwA3u6hFoP0m/gAAAP////8BAAAA=",
       Base64.getEncoder().encodeToString(floatData));
-    assertEquals("2wAAAAQAAAADAAAAAAAAAAAB/gM=",
+    assertEquals("2wAAEgQAAAADwA3u6hFoP0kB/gM=",
       Base64.getEncoder().encodeToString(byteData));
 
     assertTrue(VectorData.isFloat32(floatData));
     assertFalse(VectorData.isFloat32(doubleData));
     assertTrue(VectorData.isInt8(byteData));
     assertFalse(VectorData.isInt8(floatData));
-    assertFalse(VectorData.isInt8(new byte[] { 0 }));
+    try {
+      VectorData.isInt8(new byte[] { 0 });
+      fail("Expected SQLException for malformed VECTOR encoding");
+    }
+    catch (SQLException expected) {
+    }
 
     assertTrue(Arrays.equals(doubles,
       VectorData.decode(doubleData, double[].class, false)));
@@ -196,6 +197,19 @@ public class OracleJsonVectorTest extends JsonTestCase {
       VectorData.hashCode(sameFloatData));
 
       }
+
+  public void testStandaloneVectorDataRejectsTruncatedPayload()
+    throws SQLException {
+    byte[] data = VectorData.encode(new double[] { 1d });
+    byte[] truncated = Arrays.copyOf(data, data.length - 1);
+
+    try {
+      VectorData.decode(truncated, double[].class, false);
+      fail("Expected decode failure for truncated VECTOR payload");
+    }
+    catch (ArrayIndexOutOfBoundsException expected) {
+    }
+  }
   
   // {"embedding":vector([1,2,3])}
   private byte[] getBasicOson() {

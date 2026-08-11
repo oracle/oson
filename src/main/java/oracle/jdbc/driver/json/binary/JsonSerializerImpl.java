@@ -1,7 +1,5 @@
-/* 
- * Copyright (c) 2018, 2026, Oracle and/or its affiliates. 
- * Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl/
- */
+// Copyright (c) 2018, 2026, Oracle and/or its affiliates. 
+// Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl/ 
 
 package oracle.jdbc.driver.json.binary;
 
@@ -17,6 +15,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -488,28 +487,33 @@ public class JsonSerializerImpl extends AbstractGenerator {
   @Override
   protected OracleJsonGenerator writeVector(OracleJsonVector value) {
     writeStartArray();
-    if (value instanceof OracleJsonVectorImpl
-      && VectorData.isInt8(((OracleJsonVectorImpl)value).raw())) {
-      byte[] bytes = value.getByteArray();
-      for (byte valueByte : bytes) {
-        primitive();
-        writeInt(valueByte);
+    try {
+      if (value instanceof OracleJsonVectorImpl
+        && VectorData.isInt8(((OracleJsonVectorImpl) value).raw())) {
+        byte[] bytes = value.getByteArray();
+        for (byte valueByte : bytes) {
+          primitive();
+          writeInt(valueByte);
+        }
+      } else if (value instanceof OracleJsonVectorImpl
+        && VectorData.isFloat32(((OracleJsonVectorImpl) value).raw())) {
+        float[] floats = value.getFloatArray();
+        for (float valueFloat : floats) {
+          primitive();
+          writeFloat(valueFloat);
+        }
+      } else {
+        double[] dbls = value.getDoubleArray();
+        for (double d : dbls) {
+          primitive();
+          writeDouble(d);
+        }
       }
-    } else if (value instanceof OracleJsonVectorImpl
-      && VectorData.isFloat32(((OracleJsonVectorImpl)value).raw())) {
-      float[] floats = value.getFloatArray();
-      for (float valueFloat : floats) {
-        primitive();
-        writeFloat(valueFloat);
-      }
-    } else {
-      double[] dbls = value.getDoubleArray();
-      for (double d : dbls) {
-        primitive();
-        writeDouble(d);
-      }
+      writeEnd();
     }
-    writeEnd();
+    catch (SQLException unrecognizedEncoding) {
+      throw new OracleJsonException(unrecognizedEncoding);
+    }
     return this;
   }
 

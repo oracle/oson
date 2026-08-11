@@ -1,7 +1,5 @@
-/* 
- * Copyright (c) 2018, 2026, Oracle and/or its affiliates. 
- * Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl/
- */
+// Copyright (c) 2018, 2026, Oracle and/or its affiliates. 
+// Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl/ 
 package oracle.jdbc.driver;
 
 import java.nio.ByteBuffer;
@@ -29,21 +27,26 @@ public final class VectorData {
   private VectorData() { }
 
   public static byte[] encode(float[] values) throws SQLException {
-    return encode(values.length, FLOAT32, values.length * 4, b -> {
+    return encode(values.length, FLOAT32, values.length * 4, norm(values), b -> {
       for (float value : values) b.putInt(oracleFloatBits(value));
     });
   }
   public static byte[] encode(double[] values) throws SQLException {
-    return encode(values.length, FLOAT64, values.length * 8, b -> {
+    return encode(values.length, FLOAT64, values.length * 8, norm(values), b -> {
       for (double value : values) b.putLong(oracleDoubleBits(value));
     });
   }
   public static byte[] encode(byte[] values) throws SQLException {
-    return encode(values.length, INT8, values.length, b -> b.put(values));
+    return encode(values.length, INT8, values.length, norm(values), b -> b.put(values));
   }
 
-  public static boolean isInt8(byte[] data) { return type(data) == INT8; }
-  public static boolean isFloat32(byte[] data) { return type(data) == FLOAT32; }
+  public static boolean isInt8(byte[] data) throws SQLException {
+    return header(data).type == INT8;
+  }
+
+  public static boolean isFloat32(byte[] data) throws SQLException {
+    return header(data).type == FLOAT32;
+  }
 
   public static <T> T decode(byte[] data, Class<T> type, boolean ignored)
     throws SQLException {
@@ -73,11 +76,31 @@ public final class VectorData {
     catch (SQLException e) { return Arrays.hashCode(data); }
   }
 
-  private static byte[] encode(int length, byte type, int size, Writer writer) {
+  private static byte[] encode(int length, byte type, int size, double norm,
+    Writer writer) {
     ByteBuffer b = ByteBuffer.allocate(HEADER_SIZE + size).order(ByteOrder.BIG_ENDIAN);
-    short flags = (short)(type == INT8 || type == BINARY ? 0 : 0x0012);
-    b.put(MAGIC).put((byte)0).putShort(flags).put(type).putInt(length).putLong(0L);
+    short flags = (short)(type == BINARY ? 0 : 0x0012);
+    b.put(MAGIC).put((byte)0).putShort(flags).put(type).putInt(length)
+      .putLong(oracleDoubleBits(norm));
     writer.write(b); return b.array();
+  }
+
+  private static double norm(double[] values) {
+    double squareSum = 0d;
+    for (double value : values) squareSum += value * value;
+    return Math.sqrt(squareSum);
+  }
+
+  private static double norm(float[] values) {
+    double squareSum = 0d;
+    for (float value : values) squareSum += value * value;
+    return Math.sqrt(squareSum);
+  }
+
+  private static double norm(byte[] values) {
+    double squareSum = 0d;
+    for (byte value : values) squareSum += value * value;
+    return Math.sqrt(squareSum);
   }
 
   private static Header header(byte[] data) throws SQLException {
@@ -85,6 +108,12 @@ public final class VectorData {
     byte type = data[4]; if (type < FLOAT32 || type > BINARY) throw new SQLException("Unrecognized VECTOR type");
     int length = ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getInt(5);
     if (length < 0) throw new SQLException("Invalid VECTOR length");
+    long payloadLength = type == FLOAT64 ? 8L * length
+      : type == FLOAT32 ? 4L * length
+      : type == BINARY ? ((long)length + 7L) / 8L
+      : length;
+    if (payloadLength > data.length - HEADER_SIZE)
+      throw new ArrayIndexOutOfBoundsException(data.length);
     short flags = ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getShort(2);
     return new Header(type, length, (flags & LITTLE_ENDIAN) != 0, (flags & IEEE) != 0);
   }

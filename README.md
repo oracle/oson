@@ -7,8 +7,11 @@ representation that can be read and written without first converting to text.
 This is also the OSON implementation included in Oracle's JDBC driver. The
 source is provided here for informational purposes only. Artifacts built from
 this project are not supported and are not recommended for direct inclusion in
-applications. Applications should instead consume these classes from Oracle's
-JDBC driver:
+applications.
+
+## Installation
+
+Applications should consume these classes from Oracle's JDBC driver:
 
 ```xml
 <dependency>
@@ -18,10 +21,11 @@ JDBC driver:
 </dependency>
 ```
 
+## Documentation
+
 See [Oracle JDBC on Maven Central](https://central.sonatype.com/artifact/com.oracle.database.jdbc/ojdbc11)
 for available versions, and the [Oracle JSON API Javadocs](https://javadoc.io/doc/com.oracle.database.jdbc/ojdbc17/latest/oracle/sql/json/package-summary.html)
-for API documentation. For questions or issues, contact Josh Spiegel at
-[josh.spiegel@oracle.com](mailto:josh.spiegel@oracle.com).
+for API documentation.
 
 ## Building
 
@@ -38,7 +42,7 @@ mvn test
 
 The resulting JAR is written to `target/oson-1.0.0.jar`.
 
-## Hello, OSON
+## Examples
 
 The following example encodes a JSON object as OSON and then decodes it back
 to an `OracleJsonObject`:
@@ -66,3 +70,25 @@ OracleJsonObject object =
 
 System.out.println(object.getString("message")); // Hello, OSON!
 ```
+
+## Help
+
+For questions or issues, contact Josh Spiegel at
+[josh.spiegel@oracle.com](mailto:josh.spiegel@oracle.com).
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution process and
+Oracle Contributor Agreement requirements.
+
+## Security
+
+To report a security issue, follow Oracle's
+[vulnerability reporting process](https://www.oracle.com/corporate/security-practices/assurance/vulnerability-reporting.html).
+
+## License
+
+ Copyright (c) 2018, 2026, Oracle and/or its affiliates.
+[Universal Permissive License v1.0](LICENSE.md).
+
+This source code is exported from ADE label `JAVAVM_MAIN_LINUX.X64_260805`.

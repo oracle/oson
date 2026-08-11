@@ -1,7 +1,5 @@
-/* 
- * Copyright (c) 2018, 2026, Oracle and/or its affiliates. 
- * Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl/
- */
+// Copyright (c) 2018, 2026, Oracle and/or its affiliates. 
+// Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl/ 
 package oracle.jdbc.driver.json.jakarta;
 
 import java.io.ByteArrayOutputStream;
@@ -28,7 +26,6 @@ import oracle.jdbc.driver.json.JsonTestCase;
 import oracle.jdbc.driver.json.binary.OsonConstants;
 import oracle.jdbc.driver.json.binary.OsonPrimitiveConversions;
 import oracle.jdbc.driver.json.tree.JakartaPrimitive.JakartaNumberImpl;
-import oracle.sql.NUMBER;
 import oracle.sql.json.OracleJsonArray;
 import oracle.sql.json.OracleJsonFactory;
 import oracle.sql.json.OracleJsonGenerator;

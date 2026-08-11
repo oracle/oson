@@ -1,7 +1,5 @@
-/* 
-* Copyright (c) 2018, 2026, Oracle and/or its affiliates. 
- * Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl/
- */
+// Copyright (c) 2018, 2026, Oracle and/or its affiliates. 
+// Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl/ 
 package oracle.jdbc.driver.json.tree;
 
 import java.io.StringWriter;
@@ -9,7 +7,6 @@ import java.sql.SQLException;
 
 import oracle.jdbc.driver.VectorData;
 import oracle.jdbc.driver.json.binary.JsonSerializerImpl;
-import oracle.sql.VECTOR;
 import oracle.sql.json.OracleJsonException;
 import oracle.sql.json.OracleJsonVector;
 

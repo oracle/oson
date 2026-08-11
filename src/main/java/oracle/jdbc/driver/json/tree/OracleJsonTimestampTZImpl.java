@@ -1,7 +1,5 @@
-/* 
-* Copyright (c) 2018, 2026, Oracle and/or its affiliates. 
- * Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl/
- */
+// Copyright (c) 2018, 2026, Oracle and/or its affiliates. 
+// Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl/ 
 package oracle.jdbc.driver.json.tree;
 
 import java.time.OffsetDateTime;
@@ -12,7 +10,6 @@ import oracle.jdbc.driver.json.OracleJsonExceptions;
 import oracle.jdbc.driver.json.OracleJsonExceptions.ExceptionFactory;
 import oracle.jdbc.driver.json.binary.JsonSerializerImpl;
 import oracle.jdbc.driver.json.binary.OsonPrimitiveConversions;
-import oracle.sql.TIMESTAMPTZ;
 import oracle.sql.json.OracleJsonTimestampTZ;
 
 /**
