@@ -1,3 +1,5 @@
+OCA Verified check  
+
 # OSON Reference Implementation
 
 This project is the reference implementation for [OSON](https://osonspec.org/),
