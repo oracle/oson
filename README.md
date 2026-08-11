@@ -1,44 +1,68 @@
-*This repository acts as a template for all of Oracle’s GitHub repositories. It contains information about the guidelines for those repositories. All files and sections contained in this template are mandatory, and a GitHub app ensures alignment with these guidelines. To get started with a new repository, replace the italic paragraphs with the respective text for your project.*
+# OSON Reference Implementation
 
-# Project name
+This project is the reference implementation for [OSON](https://osonspec.org/),
+Oracle's compact binary format for JSON. OSON stores JSON values in a binary
+representation that can be read and written without first converting to text.
 
-*Describe your project's features, functionality and target audience*
+This is also the OSON implementation included in Oracle's JDBC driver. The
+source is provided here for informational purposes only. Artifacts built from
+this project are not supported and are not recommended for direct inclusion in
+applications. Applications should instead consume these classes from Oracle's
+JDBC driver:
 
-## Installation
+```xml
+<dependency>
+  <groupId>com.oracle.database.jdbc</groupId>
+  <artifactId>ojdbc11</artifactId>
+  <version><!-- use the JDBC version required by your application --></version>
+</dependency>
+```
 
-*Provide detailed step-by-step installation instructions. You can name this section **How to Run** or **Getting Started** instead of **Installation** if that's more acceptable for your project*
+See [Oracle JDBC on Maven Central](https://central.sonatype.com/artifact/com.oracle.database.jdbc/ojdbc11)
+for available versions, and the [Oracle JSON API Javadocs](https://javadoc.io/doc/com.oracle.database.jdbc/ojdbc17/latest/oracle/sql/json/package-summary.html)
+for API documentation. For questions or issues, contact Josh Spiegel at
+[josh.spiegel@oracle.com](mailto:josh.spiegel@oracle.com).
 
-## Documentation
+## Building
 
-*Developer-oriented documentation can be published on GitHub, but all product documentation must be published on <https://docs.oracle.com>*
+Prerequisites:
 
-## Examples
+* JDK 11 or later
+* Maven 3.5.2 or later
 
-*Describe any included examples or provide a link to a demo/tutorial*
+From this directory, build and run the copied tests with:
 
-## Help
+```sh
+mvn test
+```
 
-*Inform users on where to get help or how to receive official support from Oracle (if applicable)*
+The resulting JAR is written to `target/oson-1.0.0.jar`.
 
-## Contributing
+## Hello, OSON
 
-*If your project has specific contribution requirements, update the CONTRIBUTING.md file to ensure those requirements are clearly explained*
+The following example encodes a JSON object as OSON and then decodes it back
+to an `OracleJsonObject`:
 
-This project welcomes contributions from the community. Before submitting a pull request, please [review our contribution guide](./CONTRIBUTING.md)
+```java
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 
-## Security
+import oracle.sql.json.OracleJsonFactory;
+import oracle.sql.json.OracleJsonGenerator;
+import oracle.sql.json.OracleJsonObject;
 
-Please consult the [security guide](./SECURITY.md) for our responsible security vulnerability disclosure process
+OracleJsonFactory factory = new OracleJsonFactory();
+ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-## License
+OracleJsonGenerator generator = factory.createJsonBinaryGenerator(output);
+generator.writeStartObject();
+generator.write("message", "Hello, OSON!");
+generator.writeEnd();
+generator.close();
 
-*The correct copyright notice format for both documentation and software is*
-    "Copyright (c) [year,] year Oracle and/or its affiliates."
-*You must include the year the content was first released (on any platform) and the most recent year in which it was revised*
+byte[] oson = output.toByteArray();
+OracleJsonObject object =
+    factory.createJsonBinaryValue(ByteBuffer.wrap(oson)).asJsonObject();
 
-Copyright (c) 2026 Oracle and/or its affiliates.
-
-*Replace this statement if your project is not licensed under the UPL*
-
-Released under the Universal Permissive License v1.0 as shown at
-<https://oss.oracle.com/licenses/upl/>.
+System.out.println(object.getString("message")); // Hello, OSON!
+```
