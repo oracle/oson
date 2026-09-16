@@ -89,6 +89,6 @@ To report a security issue, follow Oracle's
 ## License
 
  Copyright (c) 2018, 2026, Oracle and/or its affiliates.
-[Universal Permissive License v1.0](LICENSE.md).
+[Universal Permissive License v1.0](LICENSE.txt).
 
 This source code is exported from ADE label `JAVAVM_MAIN_LINUX.X64_260805`.
