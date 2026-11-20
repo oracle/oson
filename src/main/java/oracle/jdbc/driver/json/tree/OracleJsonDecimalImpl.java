@@ -154,7 +154,7 @@ public class OracleJsonDecimalImpl extends OracleJsonNumberImpl implements Oracl
     
     SCIENTIFIC_FORMAT_NEGATIVE_EXP = (DecimalFormat) fmt.clone();
     
-    DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+    DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(Locale.US);
     symbols.setExponentSeparator("E+");
     SCIENTIFIC_FORMAT_POSITIVE_EXP.setDecimalFormatSymbols(symbols);
   }
